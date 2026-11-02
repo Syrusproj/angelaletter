@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Purr-fectly Special Letter</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffd1dc, #ff9aa2, #ffb7b2);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 15px;
+            color: #4a3b32;
+            overflow-x: hidden;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* SPECIAL ENVELOPE STYLES */
+        .envelope-container {
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .envelope-container:hover {
+            transform: scale(1.02);
+        }
+
+        .envelope-box {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px dashed #ffb3c1;
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(255, 120, 150, 0.2);
+            position: relative;
+        }
+
+        .envelope-icon {
+            font-size: 3rem;
+            margin-bottom: 8px;
+            animation: bounce 2s infinite ease-in-out;
+        }
+
+        .envelope-title {
+            font-size: 1.2rem;
+            color: #7b435b;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .envelope-sub {
+            font-size: 0.85rem;
+            color: #d87093;
+            font-weight: 600;
+        }
+
+        /* LETTER CONTAINER (CP Optimized & Dynamic Height) */
+        .letter-container {
+            background: rgba(255, 255, 255, 0.93);
+            backdrop-filter: blur(8px);
+            border: 2px solid #ffccd5;
+            max-width: 500px;
+            width: 100%;
+            height: auto;
+            padding: 40px 25px 30px 25px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(255, 120, 150, 0.25);
+            animation: fadeIn 0.8s ease-out;
+            position: relative;
+            margin: auto;
+            display: none; /* Hidden until envelope is tapped */
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .cat-stamp {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            font-size: 1.8rem;
+            background: #ffe5ec;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transform: rotate(10deg);
+        }
+
+        .date {
+            font-size: 0.8rem;
+            color: #d87093;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: #7b435b;
+            margin-bottom: 18px;
+            font-weight: 700;
+            padding-right: 40px;
+        }
+
+        .content {
+            font-size: 1rem;
+            line-height: 1.75;
+            color: #5c4752;
+            margin-bottom: 25px;
+            white-space: pre-line;
+            word-wrap: break-word;
+        }
+
+        /* Floating Kaomojis & Particles */
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, 0) scale(0.8) rotate(0deg);
+            }
+            50% {
+                transform: translate(-50%, -35px) scale(1.1) rotate(6deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -70px) scale(0.9) rotate(-6deg);
+            }
+        }
+
+        .tap-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            animation: floatUp 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            font-weight: bold;
+            color: #d84a75;
+            font-size: 0.95rem;
+            text-shadow: 0 2px 6px rgba(255, 255, 255, 0.9);
+        }
+
+        /* Kira Mascot */
+        .kira-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+
+        .kira-bubble {
+            background: #ffe5ec;
+            border: 1px solid #ffb3c1;
+            color: #7b435b;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 15px;
+            margin-bottom: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        .kira-svg {
+            transform: scale(0.9);
+            transition: transform 0.2s ease;
+        }
+
+        .kira-svg:active {
+            transform: scale(1.02);
+        }
+
+        @keyframes kiraTail {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(12deg); }
+        }
+
+        .kira-tail {
+            transform-origin: bottom left;
+            animation: kiraTail 2s ease-in-out infinite;
+        }
+
+        @keyframes kiraBlink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
+        .kira-eyes {
+            transform-origin: center;
+            animation: kiraBlink 4s ease-in-out infinite;
+        }
+
+        .footer-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-top: 1px dashed #ffb3c1;
+            padding-top: 20px;
+        }
+
+        .cat-decor {
+            font-size: 1.6rem;
+            animation: bounce 2s infinite ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .signature {
+            font-family: 'Brush Script MT', cursive, sans-serif;
+            font-size: 2rem;
+            color: #b5456b;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SPECIAL ENVELOPE (Tap to Open Mail) -->
+    <div id="envelope" class="envelope-container" onclick="openMail(event)">
+        <div class="envelope-box">
+            <div class="envelope-icon">✉️</div>
+            <div class="envelope-title">You Have Special Mail!</div>
+            <div class="envelope-sub">Tap to open envelope 🐾 (ฅ^•ﻌ•^ฅ)</div>
+        </div>
+    </div>
+
+    <!-- LETTER CONTAINER -->
+    <div id="letter" class="letter-container">
+        <div class="cat-stamp">🐱</div>
+        <div class="date">November 3, 2026</div>
+        
+        <h1>To My Beloved, Angela</h1>
+        
+        <div class="content">Happy monthsary, babi!
+
+Eleven months have passed, yet it feels like time slipped away without me even noticing, simply because I was too busy being happy with you. Eleven months of precious memories, countless little moments, and a love that I'll carry with me forever.
+
+Thank you for always finding ways to show me how much you love me. Even on the most ordinary days, you have this beautiful way of making everything feel special. You're the reason my heart finds happiness in the simplest moments, turning even the dullest days into something worth remembering.
+
+And babi, even when my words fail to reassure you, please trust me when I say that I love you more than I could ever put into words. I may not always know how to express it, but never mistake my inability to find the right words for a lack of love. I love you, always.
+
+Happy 11 months! I love you endlessly, babiෆ⁠╹⁠ ⁠.̮⁠ ⁠╹⁠ෆ.</div>
+
+        <!-- Kira Mascot (Custom Tortoiseshell Coat) -->
+        <div class="kira-container" onclick="interactKira(event)">
+            <div id="kira-bubble" class="kira-bubble">Tap Kira for meows! (ฅ^•ﻌ•^ฅ)</div>
+            <div class="kira-svg">
+                <svg width="110" height="100" viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path class="kira-tail" d="M 85 75 Q 110 70 105 45 Q 100 35 92 45" stroke="#3d3735" stroke-width="8" stroke-linecap="round" fill="none"/>
+                    <ellipse cx="60" cy="75" rx="32" ry="24" fill="#4a423f"/>
+                    <path d="M 40 65 Q 48 60 55 70 Q 45 82 35 75 Z" fill="#6e625c"/>
+                    <path d="M 68 62 Q 78 68 75 80 Q 62 82 65 70 Z" fill="#a89b91"/>
+                    <path d="M 52 80 Q 60 88 70 85 Q 58 92 48 85 Z" fill="#c4b5a5"/>
+                    <ellipse cx="42" cy="94" rx="8" ry="6" fill="#d9cac1"/>
+                    <ellipse cx="78" cy="94" rx="8" ry="6" fill="#59504c"/>
+                    <circle cx="60" cy="45" r="26" fill="#4a423f"/>
+                    <polygon points="38,30 46,8 58,24" fill="#3d3735"/>
+                    <polygon points="42,27 48,13 55,24" fill="#ffb6c1"/>
+                    <polygon points="82,30 74,8 62,24" fill="#59504c"/>
+                    <polygon points="78,27 72,13 65,24" fill="#ffb6c1"/>
+                    <path d="M 42 35 Q 52 28 50 48 Q 40 50 38 40 Z" fill="#6e625c"/>
+                    <path d="M 60 22 Q 68 20 66 32 Q 58 30 60 22 Z" fill="#b5a79b"/>
+                    <path d="M 54 48 Q 60 42 68 46 Q 66 58 52 56 Z" fill="#e0d5c8"/>
+                    <g class="kira-eyes">
+                        <ellipse cx="48" cy="42" rx="3.5" ry="4.5" fill="#2b2624"/>
+                        <ellipse cx="72" cy="42" rx="3.5" ry="4.5" fill="#2b2624"/>
+                        <circle cx="49" cy="40.5" r="1.5" fill="white"/>
+                        <circle cx="73" cy="40.5" r="1.5" fill="white"/>
+                    </g>
+                    <polygon points="58,49 62,49 60,52" fill="#ff99ac"/>
+                    <path d="M 56 54 Q 60 57 60 52 Q 60 57 64 54" stroke="#2b2624" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                    <line x1="32" y1="46" x2="18" y2="43" stroke="#d9cac1" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="32" y1="50" x2="16" y2="51" stroke="#d9cac1" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="88" y1="46" x2="102" y2="43" stroke="#d9cac1" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="88" y1="50" x2="104" y2="51" stroke="#d9cac1" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <div class="cat-decor">🐾🐾🐾</div>
+            <div class="signature">
+                With all my love, <br>
+                Syrus & Kira
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playMeow(type = 'cute') {
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'purr') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(140, now);
+                    osc.frequency.linearRampToValueAtTime(160, now + 0.2);
+                    osc.frequency.linearRampToValueAtTime(130, now + 0.5);
+
+                    gain.gain.setValueAtTime(0.01, now);
+                    gain.gain.linearRampToValueAtTime(0.2, now + 0.15);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+
+                    osc.start(now);
+                    osc.stop(now + 0.55);
+                } else {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(650, now);
+                    osc.frequency.exponentialRampToValueAtTime(950, now + 0.15);
+                    osc.frequency.exponentialRampToValueAtTime(550, now + 0.4);
+
+                    gain.gain.setValueAtTime(0.01, now);
+                    gain.gain.linearRampToValueAtTime(0.25, now + 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+                    osc.start(now);
+                    osc.stop(now + 0.45);
+                }
+            } catch(e) {}
+        }
+
+        const kaomojis = [
+            "(ฅ^•ﻌ•^ฅ)", "(⁠=⁠^⁠･⁠ω⁠･⁠^⁠=⁠)", "(⁠ฅ⁠•⁠x⁠•⁠ฅ⁠)", 
+            "Meow! 🐾", "Purrr~ 💖", "(⁠ฅ⁠i⁠_⁠i⁠ฅ⁠)", "✨", "🌸"
+        ];
+
+        function createTapParticle(x, y, textOverride = null) {
+            const particle = document.createElement('div');
+            particle.className = 'tap-particle';
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+            particle.innerText = textOverride || kaomojis[Math.floor(Math.random() * kaomojis.length)];
+            
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 1200);
+        }
+
+        function openMail(e) {
+            e.stopPropagation();
+            playMeow('cute');
+            createTapParticle(e.clientX, e.clientY, "Opened! ✉️💖");
+            
+            document.getElementById('envelope').style.display = 'none';
+            document.getElementById('letter').style.display = 'block';
+        }
+
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.kira-container') || e.target.closest('#envelope')) return;
+            createTapParticle(e.clientX, e.clientY);
+            playMeow('cute');
+        });
+
+        const kiraPhrases = [
+            "Purrrrr~ 💖 (ฅ^•ﻌ•^ฅ)",
+            "Meow meow! Kira loves you! 🐾",
+            "*(nuzzles your hand)* ✨",
+            "(⁠=⁠^⁠･⁠ω⁠･⁠^⁠=⁠) Soft purrs!",
+            "Meow! Stay cozy today! 🌸"
+        ];
+
+        function interactKira(e) {
+            e.stopPropagation();
+            playMeow(Math.random() > 0.5 ? 'cute' : 'purr');
+            
+            const bubble = document.getElementById('kira-bubble');
+            bubble.innerText = kiraPhrases[Math.floor(Math.random() * kiraPhrases.length)];
+            createTapParticle(e.clientX, e.clientY, "🐾 Meow!");
+        }
+    </script>
+</body>
+</html>
